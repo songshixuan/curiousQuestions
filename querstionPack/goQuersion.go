@@ -1,4 +1,4 @@
-package main
+package Quesion
 
 import (
 	"fmt"
@@ -79,5 +79,50 @@ func Practice3(){
 }
 
 
+
+
+//q4
+type People struct {
+
+}
+
+type Animal struct {
+
+}
+
+func (a *Animal) ShowA()  {
+	fmt.Println("Fuck u!!!")
+}
+
+func (p *People) ShowA() {
+	fmt.Println("people show A")
+	p.ShowB()
+}
+func (p *People) ShowB(){
+	fmt.Println("people show B")
+}
+
+type Teacher struct {
+	People
+	Animal
+}
+
+func (t *Teacher) ShowB()  {
+	fmt.Println("Teacher show B")
+}
+
+
+func Question4() {
+	t := Teacher{}
+	t.ShowA()
+}
+
+
+/*
+func (t *Teacher) ShowA(){
+	fmt.Println("Teacher show A")
+}
+*/
+//end of q4
 
 

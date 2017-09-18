@@ -3,6 +3,7 @@
 ## Golang
 
 1. defer & panic
+
    Q: what is the output?
 
    ```go
@@ -37,6 +38,7 @@
    ```
 
 2. range
+
    Q: output?
 
    ```go
@@ -82,7 +84,8 @@
    ```
 
 3. goroutine and loop
-   A: output what?
+
+   Q: output what?
 
    ```go
    func Practice3() {
@@ -158,5 +161,185 @@
    }
    ```
 
-    
+4. anonymous field & dynamic binding & receiver
+
+   Q: what is the output?
+
+   ```go
+   type People struct {
+
+   }
+
+
+
+   func (p *People) ShowA() {
+   	fmt.Println("people show A")
+   	p.ShowB()
+   }
+   func (p *People) ShowB(){
+   	fmt.Println("people show B")
+   }
+
+   type Teacher struct {
+   	People
+   }
+
+   func (t *Teacher) ShowB()  {
+   	fmt.Println("Teacher show B")
+   }
+
+
+   func Question4() {
+   	t := Teacher{}
+   	t.ShowA()
+   }
+
+   ```
+
+   A:
+
+   ```
+   people show A
+   people show B
+   ```
+
+   showA() is people's method, no dynamic binding here!
+
+   Q:  this time teacher has showA for its own,what is the output?
+
+   ```go
+   type People struct {
+
+   }
+
+
+
+   func (p *People) ShowA() {
+   	fmt.Println("people show A")
+   	p.ShowB()
+   }
+   func (p *People) ShowB(){
+   	fmt.Println("people show B")
+   }
+
+   type Teacher struct {
+   	People
+
+   }
+
+   func (t *Teacher) ShowB()  {
+   	fmt.Println("Teacher show B")
+   }
+
+
+   func Question4() {
+   	t := Teacher{}
+   	t.ShowA()
+   }
+
+
+
+   func (t *Teacher) ShowA(){
+   	fmt.Println("Teacher show A")
+   }
+   ```
+
+   A:
+
+   ```
+   Teacher show A
+   ```
+
+   Q: 1. this time, teacher doesn't have showA its own but has two inner field has ShowA  2. how about teacher has showA its own?
+
+   ```go
+   type People struct {
+
+   }
+
+   type Animal struct {
+
+   }
+
+   func (a *Animal) ShowA()  {
+   	fmt.Println("Fuck u!!!")
+   }
+
+   func (p *People) ShowA() {
+   	fmt.Println("people show A")
+   	p.ShowB()
+   }
+   func (p *People) ShowB(){
+   	fmt.Println("people show B")
+   }
+
+   type Teacher struct {
+   	People
+   	Animal
+   }
+
+   func (t *Teacher) ShowB()  {
+   	fmt.Println("Teacher show B")
+   }
+
+
+   func Question4() {
+   	t := Teacher{}
+   	t.ShowA()
+   }
+
+   ```
+
+   A:
+
+    first A: ERROR:ambiguous selector t.ShowA
+   second A: teacher showA
+
+5. The proper way to achieve Polymorphism
+   using interface:
+
+   ```go
+   package Quesion
+
+   import "fmt"
+
+   //base class
+   type HasHobby interface {
+   	MyHobby() string
+   }
+
+
+
+   type Dog struct {
+
+   }
+
+   type Dick struct {
+
+   }
+
+   //implement Hobby
+   func (d *Dog) MyHobby() string {
+   	return "whow!"
+   }
+
+   func (d *Dick) MyHobby() string  {
+   	return "fuck"
+   }
+
+   func PolyTest1() {
+   	var hasHobby HasHobby = &Dog{}
+   	fmt.Println(hasHobby.MyHobby())
+   	hasHobby = &Dick{}
+   	fmt.Println(hasHobby.MyHobby())
+
+   }
+   ```
+
+   ​
+
+6. ​
+
+   ​
+
 

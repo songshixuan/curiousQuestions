@@ -1,5 +1,7 @@
 package main
 
+import "./querstionPack"
+
 func main() {
-	Practice1()
+	Quesion.Question4()
 }
