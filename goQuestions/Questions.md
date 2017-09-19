@@ -2,205 +2,209 @@
 
 ## Golang
 
-1. defer & panic
+### defer & panic
 
-   Q: what is the output?
+Q: what is the output?
 
-   ```go
-   func Practice1()  {
-   	defer func(){fmt.Println("1st line")
-   	}()
-   	defer func(){fmt.Println("2nd line")}()
-   	defer func(){fmt.Println("3rd line")
-   		//panic("fuck")
-   		fmt.Println("fuck panic")}()
+```go
+func Practice1()  {
+	defer func(){fmt.Println("1st line")
+	}()
+	defer func(){fmt.Println("2nd line")}()
+	defer func(){fmt.Println("3rd line")
+		//panic("fuck")
+		fmt.Println("fuck panic")}()
 
-   	defer func() {
-   		fmt.Println("4th line")
-   		panic("fuck")
-   	} ()
+	defer func() {
+		fmt.Println("4th line")
+		panic("fuck")
+	} ()
 
-   }
-   ```
+}
+```
 
-   A:
+A:
 
-   ```
-   4th line
-   3rd line
-   fuck panic
-   2nd line
-   1st line
-   panic: fuck
+```
+4th line
+3rd line
+fuck panic
+2nd line
+1st line
+panic: fuck
 
-   defer operation is pushed to stack,first in last out
+defer operation is pushed to stack,first in last out
 
-   ```
+```
+### range
 
-2. range
+Q: output?
 
-   Q: output?
+```go
+type student struct {
+	Name string
+	Age 	int
+}
 
-   ```go
-   type student struct {
-   	Name string
-   	Age 	int
-   }
+func Practice2() {
+	m := make(map[string]*student)
+	stus := []student{
+		{Name:"zhou",Age:25},
+		{Name:"diaosi",Age:99},
+	}
+	//range return index and copy of element
+	for _,stu := range stus{
+		m[stu.Name] = &stu
+	}
 
-   func Practice2() {
-   	m := make(map[string]*student)
-   	stus := []student{
-   		{Name:"zhou",Age:25},
-   		{Name:"diaosi",Age:99},
-   	}
-   	//range return index and copy of element
-   	for _,stu := range stus{
-   		m[stu.Name] = &stu
-   	}
+/*
+	for i := 0; i < len(stus); i++{
+		m[stus[i].Name] = &stus[i]
+	}
+*/
+	for k,v := range m{
+		fmt.Println("name:",k)
+		fmt.Println("status",v.Name,v.Age)
+	}
+}
 
-   /*
-   	for i := 0; i < len(stus); i++{
-   		m[stus[i].Name] = &stus[i]
-   	}
-   */
-   	for k,v := range m{
-   		fmt.Println("name:",k)
-   		fmt.Println("status",v.Name,v.Age)
-   	}
-   }
+```
 
-   ```
+A: 
 
-   A: 
+```
+name: zhou
+status diaosi 99
+name: diaosi
+status diaosi 99
 
-   ```
-   name: zhou
-   status diaosi 99
-   name: diaosi
-   status diaosi 99
+When ranging over a slice, two values are returned for each iteration. The first is the index, and the second is a copy of the element at that index.
+导致map里的student指针指向copy element的地址，copy element地址没变，所以引用的值是一样的，
+```
+### goroutine and loop
 
-   When ranging over a slice, two values are returned for each iteration. The first is the index, and the second is a copy of the element at that index.
-   导致map里的student指针指向copy element的地址，copy element地址没变，所以引用的值是一样的，
-   ```
+Q: output what?
 
-3. goroutine and loop
+```go
+func Practice3() {
+	runtime.GOMAXPROCS(1) //use no more than one logic cpu
+	wg := sync.WaitGroup{}
+	wg.Add(20)
+	for i := 0; i < 10; i++ {
+		go func() {
+			fmt.Println("i: ", i)
+			wg.Done()
+		}()
+		if i == 9 {
+			fmt.Println("loop1 over")
+		}
+	}
+	for i := 10; i < 20; i++ {
+		//fmt.Println(i)
+		go func() {
+			fmt.Println("i: ", i)
+			wg.Done()
+		}()
+		if i == 19 {
+			fmt.Println("loop2 over")
+		}
+	}
+	wg.Wait()
+}
+```
 
-   Q: output what?
+A: 
 
-   ```go
-   func Practice3() {
-   	runtime.GOMAXPROCS(1) //use no more than one logic cpu
-   	wg := sync.WaitGroup{}
-   	wg.Add(20)
-   	for i := 0; i < 10; i++ {
-   		go func() {
-   			fmt.Println("i: ", i)
-   			wg.Done()
-   		}()
-   		if i == 9 {
-   			fmt.Println("loop1 over")
-   		}
-   	}
-   	for i := 10; i < 20; i++ {
-   		//fmt.Println(i)
-   		go func() {
-   			fmt.Println("i: ", i)
-   			wg.Done()
-   		}()
-   		if i == 19 {
-   			fmt.Println("loop2 over")
-   		}
-   	}
-   	wg.Wait()
-   }
-   ```
+```
+loop1 over
+loop2 over
+i:  20
+i:  10
+i:  10
+i:  10
+i:  10
+i:  10
+i:  10
+i:  10
+i:  10
+i:  10
+i:  10
+i:  20
+i:  20
+i:  20
+i:  20
+i:  20
+i:  20
+i:  20
+i:  20
+i:  20
 
-   A: 
+because the goroutines will probably not begin executing until after the loop;
+it comes especially when runtime logic cpu is one
+```
 
-   ```
-   loop1 over
-   loop2 over
-   i:  20
-   i:  10
-   i:  10
-   i:  10
-   i:  10
-   i:  10
-   i:  10
-   i:  10
-   i:  10
-   i:  10
-   i:  10
-   i:  20
-   i:  20
-   i:  20
-   i:  20
-   i:  20
-   i:  20
-   i:  20
-   i:  20
-   i:  20
+The proper ways to write that closure loop are these two:
 
-   because the goroutines will probably not begin executing until after the loop;
-   it comes especially when runtime logic cpu is one
-   ```
+```go
+for val := range values {
+	go func(val interface{}) {
+		fmt.Println(val)
+	}(val)
+}
+for i := range valslice {
+	val := valslice[i]
+	go func() {
+		fmt.Println(val)
+	}()
+}
+```
+### anonymous field & dynamic binding & receiver
 
-   The proper ways to write that closure loop are these two:
+Q: what is the output?
 
-   ```go
-   for val := range values {
-   	go func(val interface{}) {
-   		fmt.Println(val)
-   	}(val)
-   }
-   for i := range valslice {
-   	val := valslice[i]
-   	go func() {
-   		fmt.Println(val)
-   	}()
-   }
-   ```
+```go
+type People struct {
 
-4. anonymous field & dynamic binding & receiver
+}
+  func (p *People) ShowA() {
 
-   Q: what is the output?
-
-   ```go
-   type People struct {
-
-   }
-
-
-
-   func (p *People) ShowA() {
    	fmt.Println("people show A")
+
    	p.ShowB()
+
    }
+
    func (p *People) ShowB(){
+
    	fmt.Println("people show B")
+
    }
 
    type Teacher struct {
+
    	People
+
    }
 
    func (t *Teacher) ShowB()  {
-   	fmt.Println("Teacher show B")
-   }
 
+   	fmt.Println("Teacher show B")
+
+   }
 
    func Question4() {
+
    	t := Teacher{}
+
    	t.ShowA()
+
    }
 
-   ```
+```
 
-   A:
 
-   ```
-   people show A
-   people show B
+ 
+
    ```
 
    showA() is people's method, no dynamic binding here!
@@ -295,22 +299,20 @@
     first A: ERROR:ambiguous selector t.ShowA
    second A: teacher showA
 
-5. The proper way to achieve Polymorphism
-   using interface:
+### The proper way to achieve Polymorphism
 
-   ```go
-   package Quesion
+using interface:
 
-   import "fmt"
+```go
+package Quesion
 
-   //base class
-   type HasHobby interface {
-   	MyHobby() string
-   }
+import "fmt"
 
-
-
-   type Dog struct {
+//base class
+type HasHobby interface {
+	MyHobby() string
+}
+ type Dog struct {
 
    }
 
@@ -319,27 +321,32 @@
    }
 
    //implement Hobby
+
    func (d *Dog) MyHobby() string {
+
    	return "whow!"
+
    }
 
    func (d *Dick) MyHobby() string  {
+
    	return "fuck"
+
    }
 
    func PolyTest1() {
+
    	var hasHobby HasHobby = &Dog{}
+
    	fmt.Println(hasHobby.MyHobby())
+
    	hasHobby = &Dick{}
+
    	fmt.Println(hasHobby.MyHobby())
 
    }
-   ```
 
-   ​
-
-6. ​
-
-   ​
+```
 
 
+  
