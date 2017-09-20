@@ -203,7 +203,7 @@ type People struct {
 ```
 
 
- 
+
 
    ```
 
@@ -349,4 +349,77 @@ type HasHobby interface {
 ```
 
 
-  
+
+### channel out order
+
+what is the output?
+
+```go
+runtime.GOMAXPROCS(1)
+	int_chan := make(chan int,1)
+	string_chan := make(chan string,1)
+	int_chan <- 1
+	string_chan <- "hello"
+	select {
+	case v1 := <- int_chan:
+		fmt.Println(v1)
+	case v2 := <- string_chan:
+		fmt.Println(v2)
+	
+```
+
+v1 v2 occurs **randomly**!
+
+
+
+### Slice length and capacity
+
+```go
+func Question7() {
+	s := make([]int,5)
+	s = append(s,1,2,3)
+	fmt.Println(s)
+}
+```
+
+output is 0 0 0 0 0 1 2 3
+
+the second argument is length,the third is capacity
+
+
+
+### interface
+
+```go
+type Pig interface {
+	Show()
+}
+
+type Poppy struct {
+
+}
+
+func (p *Poppy) Show(){
+
+}
+
+func live() Pig{
+	var pp *Poppy
+	return pp
+}
+
+
+func Question11(){
+	if live() == nil{
+		fmt.Println("AAAAA")
+	}else{
+		fmt.Printf("%T %v",live(),live())
+		fmt.Println(reflect.TypeOf(live()))
+		fmt.Println(reflect.ValueOf(live()))
+		fmt.Println("BBBBB")
+	}
+	
+}
+```
+
+print bbbbb because interface has (val,type) tuple, it cannout be nil itself !

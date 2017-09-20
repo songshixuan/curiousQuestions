@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"runtime"
 	"sync"
+	"reflect"
+	"go/types"
 )
 
 func Practice1()  {
@@ -113,8 +115,8 @@ func (t *Teacher) ShowB()  {
 
 
 func Question4() {
-	t := Teacher{}
-	t.ShowA()
+	//t := Teacher{}
+	//t.ShowA()
 }
 
 
@@ -126,3 +128,79 @@ func (t *Teacher) ShowA(){
 //end of q4
 
 
+func Question5(){
+	runtime.GOMAXPROCS(1)
+	int_chan := make(chan int,1)
+	string_chan := make(chan string,1)
+	int_chan <- 1
+	string_chan <- "hello"
+	select {
+	case v1 := <- int_chan:
+		fmt.Println(v1)
+	case v2 := <- string_chan:
+		fmt.Println(v2)
+	}
+}
+
+func Question7() {
+	s := make([]int,5)
+	s = append(s,1,2,3)
+	fmt.Println(s)
+}
+
+type UserAges struct {
+	ages map[string]int
+	sync.Mutex
+}
+
+func (ua *UserAges) Add(name string,age int){
+	ua.Lock()
+	defer ua.Unlock()
+	ua.ages[name] = age
+}
+
+func (ua *UserAges) Get(name string)int{
+	if age,ok := ua.ages[name];ok{
+		return age
+	}
+	return -1
+}
+
+func Question8(){
+	ua := UserAges{}
+	ua.ages = make(map[string]int)
+	ua.Add("Liuda",88)
+	fmt.Println(ua.Get("Liuda"))
+
+}
+
+
+type Pig interface {
+	Show()
+}
+
+type Poppy struct {
+
+}
+
+func (p *Poppy) Show(){
+
+}
+
+func live() Pig{
+	var pp *Poppy
+	return pp
+}
+
+func Question11(){
+	if live() == nil{
+		fmt.Println("AAAAA")
+	}else{
+		fmt.Printf("%T %v",live(),live())
+		fmt.Println(reflect.TypeOf(live()))
+		fmt.Println(reflect.ValueOf(live()))
+		fmt.Println("BBBBB")
+	}
+
+
+}
