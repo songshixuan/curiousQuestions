@@ -11,8 +11,28 @@ struct RetVal{
 
     }
 
+	friend bool operator<=(const RetVal& l, const RetVal& r)
+    {
+        return l.max <= r.max;
+    }
+    friend bool operator>=(const RetVal& l,const RetVal& r){
+        return !(l<=r);
+    }
+	friend bool operator==(const RetVal& l, const RetVal& r)
+    {
+        return l.max == r.max;
+    }
+
 };
 
+
+
+
+std::ostream& operator<<(std::ostream& out, const RetVal& retVal)
+{
+       return out << retVal.i << " ; " << retVal.j << " ; " << retVal.max << "." << endl;
+
+}
 RetVal maxCrossing(const vector<int>& vec,int low, int mid, int high){
     //left
     int lmax = INT_MIN,lsum = 0,left = 0;
@@ -36,10 +56,31 @@ RetVal maxCrossing(const vector<int>& vec,int low, int mid, int high){
     return RetVal(left,right,lmax+rmax);
 }
 
+RetVal findMaxSubArr(const vector<int>& nums, int low, int high){
+    if(low == high){
+        return RetVal(low,low,nums[low]);
+    }
+    int mid = (low + high)/2;
+    auto lRet = findMaxSubArr(nums,low,mid);
+    auto rRet = findMaxSubArr(nums,mid+1,high);
+    auto mRet = maxCrossing(nums,low,mid,high);
+    if( lRet >= rRet && lRet >= mRet ){
+        return lRet;
+    }else if(rRet >= mRet && rRet >= lRet){
+        return rRet;
+    }else{
+        return mRet;
+    }
+
+}
+
+
 
 int main(){
-    std::vector<int> words1 {1,2,3,4,5};
-    //auto r = maxCrossing(vec,0,1,2);
-    //std::cout << r;
+    std::vector<int> nums {-2,1,-3,4,-1,2,1,-5,4};
+    //auto r = maxCrossing(nums,0,(0+nums.size()-1)/2,nums.size()-1);
+    //cout << r;
+    auto ret = findMaxSubArr(nums,0,nums.size()-1);
+    cout << ret;
     return 0;
 }
