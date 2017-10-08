@@ -68,14 +68,47 @@ void mergeSort(vector<int>&nums,int p, int r){
 
 
 
+/*
+ *  used by quickSort
+ * return pivot
+ */
+int partition(vector<int>& nums,int p,int r){
+    //get the pivot
+    int x = nums[r];
+    int i = p - 1;
+    for (int j = p; j < r ; ++j){
+        if(nums[j] <= x){
+            ++i;
+            std::swap(nums[j],nums[i]);
+        }
+    }
+    std::swap(nums[i+1],nums[r]);
+    return i+1;
+}
+
+
+/*
+ *
+ */
+void quickSort(vector<int>& nums,int p,int r){
+
+    if(p < r){
+        //divide
+        auto pivot = partition(nums,p,r);
+        quickSort(nums,p,pivot-1);
+        quickSort(nums,pivot+1,r);
+        //no need to merge
+    }
+
+}
 
 int main()
 {
     std::vector<int> mem = {4,5,1,2,9,10,23,11,66};
     //insertionSort(mem);
-    mergeSort(mem,0,mem.size()-1);
+    //mergeSort(mem,0,mem.size()-1);
     //merge(mem,0,2,3);
-
+    quickSort(mem,0,mem.size()-1);
     for(auto p: mem)
         std::cout << p << ";" ;
     std::cout << endl;
