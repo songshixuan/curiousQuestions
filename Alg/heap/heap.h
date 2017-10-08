@@ -61,9 +61,14 @@ public:
         std::cout << std::endl;
     }
 
-private:
+protected:
     std::vector<int> mArray;
     int mHeapSize;
+
+
+    inline  int parent(int i){
+        return i/2;
+    }
 
 };
 
