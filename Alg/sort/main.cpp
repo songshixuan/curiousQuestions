@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
+#include "counting_sort.h"
 void insertionSort(vector<int> &nums){
     int len = nums.size();
     if (len < 2){
@@ -104,13 +104,13 @@ void quickSort(vector<int>& nums,int p,int r){
 
 int main()
 {
+    /*
     std::vector<int> mem = {4,5,1,2,9,10,23,11,66};
-    //insertionSort(mem);
-    //mergeSort(mem,0,mem.size()-1);
-    //merge(mem,0,2,3);
     quickSort(mem,0,mem.size()-1);
     for(auto p: mem)
         std::cout << p << ";" ;
     std::cout << endl;
+    */
+    countingSortTestCase();
     return 0;
 }
