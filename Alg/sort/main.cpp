@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
-using namespace std;
 #include "counting_sort.h"
+#include "bucket.h"
+using namespace std;
 void insertionSort(vector<int> &nums){
     int len = nums.size();
     if (len < 2){
@@ -111,6 +112,7 @@ int main()
         std::cout << p << ";" ;
     std::cout << endl;
     */
-    countingSortTestCase();
+//    countingSortTestCase();
+    bucketTest();
     return 0;
 }
