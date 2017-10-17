@@ -6,7 +6,7 @@ struct Node{
     Node* l;
     Node* r;
     Node* p;
-    Node(int v,Node* left=nullptr,Node* right=nullptr,Node* parent=nullptr):l(left),r(right),p(parent),val(v){
+    Node(int v=10,Node* left=nullptr,Node* right=nullptr,Node* parent=nullptr):l(left),r(right),p(parent),val(v){
 
     }
 };
@@ -47,6 +47,7 @@ struct Tree{
 
     void inorder_traverse(Node *x){
         if(x != nullptr){
+            cout << "not null" << endl;
             inorder_traverse(x->l);
             cout << x->val << endl;
             inorder_traverse(x->r);
@@ -71,8 +72,63 @@ struct Tree{
         return p;
     }
 
-    void del(Node* x){
+    Node* del(Node*t,int k){
+        if(t == nullptr){
+            return nullptr;
+        }
+        Node* p = nullptr;
+        Node* n = t;
+        while(n != nullptr && n->val != k){
+            p = n;
+            if(k < n->val){
+                n = n->l;
+            }else if(k > n->val){
+                n = n->r;
+            }
+        }
+        if(n->l == nullptr && n->r == nullptr){
+            if(p == nullptr){
+                //this is the root
+                delete n;
+                n = nullptr;
+                return nullptr;
+            }
+            if(p->l == n){
+                p->l = nullptr;
 
+            }else{
+                p->r = nullptr;
+            }
+            delete n;
+            n = nullptr;
+        }else if(n->l != nullptr && n->r != nullptr){
+            Node * suc = next(n);
+            n->val = suc->val;
+            del(suc,suc->val);
+        }else{
+            Node*child = nullptr;
+            if( n->l != nullptr ){
+                child = n->l;
+            }else{
+                child = n->r;
+            }
+            if(p == nullptr){
+                //delete root
+                delete n;
+                n = nullptr;
+                return child;
+            }
+
+            if(n == p->l){
+                p->l = child;
+            }else{
+                p->r = child;
+            }
+            delete n;
+            n= nullptr;
+        }
+
+        return root;
     }
 
     Node*  prev(){
@@ -112,10 +168,13 @@ struct Tree{
 
 void testcase1(){
     Tree t;
+    t.insert(1);
     t.insert(6);
-    t.insert(3);
-    t.insert(9);
     t.inorder_traverse(t.root);
+    t.root = t.del(t.root,1);
+    cout << "after delete" << endl;
+    t.inorder_traverse(t.root);
+    cout << "--" << endl;
 
 }
 
@@ -165,7 +224,6 @@ void testcaseFind(){
         cout << "did't find " << k  << endl;
     }
 
-
 }
 
 
@@ -174,7 +232,7 @@ void testcaseFind(){
 
 int main(){
 //    testcase2();
-    testcaseFind();
+    testcase1();
 
     return 0;
 }
