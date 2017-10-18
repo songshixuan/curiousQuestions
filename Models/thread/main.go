@@ -41,10 +41,16 @@ func incr(i int) {
 	}
 }
 
-func main() {
+func mutexTest() {
+
 	wg.Add(2)
 	go mutIncr(100000)
 	go mutIncr(100000)
 	wg.Wait()
 	fmt.Println("glob=", glob)
+
+}
+
+func main() {
+	noCondTest()
 }
