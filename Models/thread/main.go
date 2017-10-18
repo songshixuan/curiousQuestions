@@ -52,5 +52,5 @@ func mutexTest() {
 }
 
 func main() {
-	noCondTest()
+	CondTest()
 }
