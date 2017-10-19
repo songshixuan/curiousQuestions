@@ -32,6 +32,16 @@ struct Thread{
 
 
 struct Pool{
+    virtual ~Pool(){
+        delete mCv;
+        delete mMut;
+        mCv =  nullptr;
+        mMut = nullptr;
+        for(auto m:mTs){
+            delete m;
+            m = nullptr;
+        }
+    }
     Pool(const std::vector<int>& vec):mUnjoined(0){
         mMut = new std::mutex();
         mCv = new std::condition_variable();
