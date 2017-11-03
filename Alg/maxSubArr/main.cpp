@@ -75,12 +75,28 @@ RetVal findMaxSubArr(const vector<int>& nums, int low, int high){
 }
 
 
+//DP method
+int maxSubArr(std::vector<int>& nums){
+    int sum = 0, max = 0;
+    for(int i = 0; i < nums.size(); ++i){
+        sum += nums[i];
+        if(sum > max){
+            max = sum;
+        }
+        if(sum < 0){
+            sum = 0;
+        }
+    }
+    return max;
+}
+
 
 int main(){
     std::vector<int> nums {-2,1,-3,4,-1,2,1,-5,4};
     //auto r = maxCrossing(nums,0,(0+nums.size()-1)/2,nums.size()-1);
     //cout << r;
     auto ret = findMaxSubArr(nums,0,nums.size()-1);
-    cout << ret;
+    auto ret2 = maxSubArr(nums);
+    cout <<"result :"  <<ret.max << " " << ret2 << endl;
     return 0;
 }

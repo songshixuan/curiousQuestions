@@ -42,6 +42,7 @@ struct Pool{
             m = nullptr;
         }
     }
+
     Pool(const std::vector<int>& vec):mUnjoined(0){
         mMut = new std::mutex();
         mCv = new std::condition_variable();
