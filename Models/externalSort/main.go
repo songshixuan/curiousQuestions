@@ -27,7 +27,6 @@ func createHeap(arr []int, siz int) *Heap {
 }
 
 /**
-
  */
 func heapTest() {
 	var arr = []int{87, 25, 4, 6, 7, 99, 53}
@@ -95,8 +94,10 @@ func (h *Heap) GetAndAdd(num int) (int, error) {
 
 func (h *Heap) Pop() (int, error) {
 	if h.HeapSiz <= 0 {
+		fmt.Println("pop error")
 		return 0, fmt.Errorf("empty")
 	} else {
+		fmt.Println("pop",h.HeapArray[1])
 		h.HeapSiz--
 		return h.HeapArray[1], nil
 	}
@@ -104,6 +105,13 @@ func (h *Heap) Pop() (int, error) {
 
 func (h *Heap) Push(n int) {
 	h.HeapSiz++
+	if len(h.HeapArray)  <= h.HeapSiz {
+		old := h.HeapArray
+		h.HeapArray = make([]int,10 * h.HeapSiz)
+		for i,v := range old{
+			h.HeapArray[i] = v
+		}
+	}
 	h.HeapArray[1] = n
 	h.minHeap(1)
 }
@@ -114,10 +122,11 @@ const (
 	ORDERED_POSTFIX = ".~otmp"
 )
 
-func quickSortWrapper(n int) {
+func quickSortWrapper(n int) []string{
 
 	//newName := filename+ POSTFIX_ORDER
 
+	var ordered = make([]string,n)
 	var wg sync.WaitGroup
 	for i := 0; i < n; i++ {
 		go func(name string, index int) {
@@ -146,6 +155,7 @@ func quickSortWrapper(n int) {
 			quickSort(arr, 0, len(arr)-1)
 
 			orderedFname := fmt.Sprintf("%s%d%s", FILE_PREFIX, index, ORDERED_POSTFIX)
+			ordered[index] = orderedFname
 			fmt.Println("create " + orderedFname)
 			wf, err := os.Create(orderedFname)
 			if err != nil {
@@ -160,9 +170,11 @@ func quickSortWrapper(n int) {
 			defer wf.Close()
 			defer wg.Done()
 
+
 		}(fmt.Sprintf("%s%d%s", FILE_PREFIX, i, FILE_POSTFIX), i)
 	}
 	wg.Wait()
+	return ordered
 }
 
 func Partition(arr []int, l, r int) int {
@@ -188,21 +200,67 @@ func quickSort(arr []int, l, r int) {
 
 }
 
+
+/*
+merge seperated result into one file
+ */
 func mergeResults(files []string, maxHeapHiz int) {
-	//inchannel
-	dataC := make(chan int)
-	quit := make(chan struct{})
-	for {
-		select {
-		case <-quit:
-			return
-		case data := <-dataC:
-			fmt.Println(data)
-		}
+
+
+	var filechannelMap = make(map[string]chan int)
+	for _,v := range files{
+		filechannelMap[v] = make(chan int)
+		go func(f string,C chan int) {
+			file, err := os.Open(f)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer file.Close()
+
+			scanner := bufio.NewScanner(file)
+
+			for scanner.Scan() {
+				//fmt.Println(scanner.Text())
+				iNum, _ := strconv.Atoi(scanner.Text())
+				C <- iNum
+			}
+			close(C)
+
+		}(v,filechannelMap[v])
 	}
+
+	final := "results.txt"
+	wf, err := os.Create(final)
+	defer wf.Close()
+	if err != nil {
+		fmt.Printf("error creating file: %v", err)
+		return
+	}
+
+	h := createHeap(make([]int,0),0)
+	for _,v := range files{
+		h.Push(<-filechannelMap[v])
+	}
+	fmt.Println("HeapArray:",h.HeapArray)
+	for ; h.HeapSiz > 0;{
+		i,_ := h.Pop()
+		wf.WriteString(fmt.Sprintf("%d\n",i))
+		fName := files[i % 100]
+		v, ok :=  <-filechannelMap[fName]
+		if ok{
+			h.Push(v)
+		}
+
+
+	}
+
 
 }
 
 func main() {
-	quickSortWrapper(100)
+	orederedFiles := quickSortWrapper(100)
+
+	mergeResults(orederedFiles,100)
+
 }
+
