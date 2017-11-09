@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/Workiva/go-datastructures/fibheap"
 	"log"
 	"os"
 	"strconv"
@@ -97,7 +98,7 @@ func (h *Heap) Pop() (int, error) {
 		fmt.Println("pop error")
 		return 0, fmt.Errorf("empty")
 	} else {
-		fmt.Println("pop",h.HeapArray[1])
+		fmt.Println("pop", h.HeapArray[1])
 		h.HeapSiz--
 		return h.HeapArray[1], nil
 	}
@@ -105,10 +106,10 @@ func (h *Heap) Pop() (int, error) {
 
 func (h *Heap) Push(n int) {
 	h.HeapSiz++
-	if len(h.HeapArray)  <= h.HeapSiz {
+	if len(h.HeapArray) <= h.HeapSiz {
 		old := h.HeapArray
-		h.HeapArray = make([]int,10 * h.HeapSiz)
-		for i,v := range old{
+		h.HeapArray = make([]int, 10*h.HeapSiz)
+		for i, v := range old {
 			h.HeapArray[i] = v
 		}
 	}
@@ -122,11 +123,11 @@ const (
 	ORDERED_POSTFIX = ".~otmp"
 )
 
-func quickSortWrapper(n int) []string{
+func quickSortWrapper(n int) []string {
 
 	//newName := filename+ POSTFIX_ORDER
 
-	var ordered = make([]string,n)
+	var ordered = make([]string, n)
 	var wg sync.WaitGroup
 	for i := 0; i < n; i++ {
 		go func(name string, index int) {
@@ -170,7 +171,6 @@ func quickSortWrapper(n int) []string{
 			defer wf.Close()
 			defer wg.Done()
 
-
 		}(fmt.Sprintf("%s%d%s", FILE_PREFIX, i, FILE_POSTFIX), i)
 	}
 	wg.Wait()
@@ -200,17 +200,15 @@ func quickSort(arr []int, l, r int) {
 
 }
 
-
 /*
 merge seperated result into one file
- */
+*/
 func mergeResults(files []string, maxHeapHiz int) {
 
-
 	var filechannelMap = make(map[string]chan int)
-	for _,v := range files{
+	for _, v := range files {
 		filechannelMap[v] = make(chan int)
-		go func(f string,C chan int) {
+		go func(f string, C chan int) {
 			file, err := os.Open(f)
 			if err != nil {
 				log.Fatal(err)
@@ -226,7 +224,7 @@ func mergeResults(files []string, maxHeapHiz int) {
 			}
 			close(C)
 
-		}(v,filechannelMap[v])
+		}(v, filechannelMap[v])
 	}
 
 	final := "results.txt"
@@ -236,31 +234,28 @@ func mergeResults(files []string, maxHeapHiz int) {
 		fmt.Printf("error creating file: %v", err)
 		return
 	}
+	heap := fibheap.NewFloatFibHeap()
 
-	h := createHeap(make([]int,0),0)
-	for _,v := range files{
-		h.Push(<-filechannelMap[v])
+	for _, v := range files {
+		heap.Enqueue(float64(<-filechannelMap[v]))
 	}
-	fmt.Println("HeapArray:",h.HeapArray)
-	for ; h.HeapSiz > 0;{
-		i,_ := h.Pop()
-		wf.WriteString(fmt.Sprintf("%d\n",i))
-		fName := files[i % 100]
-		v, ok :=  <-filechannelMap[fName]
-		if ok{
-			h.Push(v)
+
+	for heap.Size() > 0 {
+		min, _ := heap.DequeueMin()
+		wf.WriteString(fmt.Sprintf("%v\n", min.Priority))
+		fName := files[int(min.Priority)%100]
+		v, ok := <-filechannelMap[fName]
+		if ok {
+			heap.Enqueue(float64(v))
 		}
 
-
 	}
-
 
 }
 
 func main() {
 	orederedFiles := quickSortWrapper(100)
 
-	mergeResults(orederedFiles,100)
+	mergeResults(orederedFiles, 100)
 
 }
-
