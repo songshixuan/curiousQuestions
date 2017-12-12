@@ -10,6 +10,22 @@ And you need to output the maximum average value.
 1 <= k <= n <= 30,000.
 */
 func findMaxAverage(arr []int, k int) float64 {
+	firstPart := arr[:k] //0~k-1, k numbers
+	sum := 0
+	max := 0
+	restPart := arr[k:] //k~end
+	for _, v := range firstPart {
+		sum += v
+	}
+	max = sum
+	for i, v := range restPart {
+		sum = sum + v - arr[i]
+		if max < sum {
+			max = sum
+		}
+
+	}
+	return float64(max) / float64(k)
 
 }
 
