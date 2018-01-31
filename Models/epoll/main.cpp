@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 {
 	printf("epoll socket begins.\n");
 	int i, maxi, listenfd, connfd, sockfd, epfd, nfds;
+	int process = 0;
 	ssize_t n;
 	char line[MAXLINE];
 	socklen_t clilen;
@@ -94,6 +95,7 @@ int main(int argc, char *argv[])
 			}
 			else if(events[i].events & EPOLLIN) {
 				if((sockfd = events[i].data.fd) < 0) continue;
+				if (process++ % 2 == 0) continue;
 				if((n = read(sockfd, line, MAXLINE)) < 0) {
 					if(errno == ECONNRESET) {
 						printf("end");
